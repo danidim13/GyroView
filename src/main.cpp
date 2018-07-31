@@ -16,7 +16,7 @@ int main(int argc, char** argv )
         return -1;
     }
     namedWindow("Gyro View", WINDOW_AUTOSIZE );
-    imshow("Display", image);
+    imshow("Gyro View", image);
     waitKey(0);
     return 0;
 }
