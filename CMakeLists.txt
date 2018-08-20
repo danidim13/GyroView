@@ -11,6 +11,12 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 set( GYROVIEW_SOURCES
   src/main.cpp
 )
+set( MARKER_SOURCES
+  src/make_markers.cpp
+)
 
 add_executable( GyroView ${GYROVIEW_SOURCES} )
+add_executable( MakeMarkers ${MARKER_SOURCES} )
+
 target_link_libraries( GyroView ${OpenCV_LIBS} )
+target_link_libraries( MakeMarkers ${OpenCV_LIBS} )
