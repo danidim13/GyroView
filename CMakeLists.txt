@@ -15,6 +15,8 @@ set( MARKER_SOURCES
   src/make_markers.cpp
 )
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_executable( GyroView ${GYROVIEW_SOURCES} )
 add_executable( MakeMarkers ${MARKER_SOURCES} )
 
