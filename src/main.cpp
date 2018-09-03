@@ -8,29 +8,60 @@
 
 
 using namespace cv;
+using namespace std;
 
+int SimpleGrab()
+{
+    VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        cerr << "ERROR: Unable to open the camera" << endl;
+        return 0;
+    }
+
+    Mat frame;
+    cout << "Start grabbing, press a key on Live window to terminate" << endl;
+    while(1) {
+        cap >> frame;
+        if (frame.empty()) {
+            cerr << "ERROR: Unable to grab from the camera" << endl;
+            break;
+        }
+        imshow("Live",frame);
+        int key = cv::waitKey(5);
+        key = (key==255) ? -1 : key; //#Solve bug in 3.2.0
+        if (key>=0)
+        break;
+    }
+
+    cout << "Closing the camera" << endl;
+    cap.release();
+    destroyAllWindows();
+    cout << "bye!" <<endl;
+    return 0;
+}
 
 int Playback()
 {
     VideoCapture cap;
-    cap.cv::VideoCapture::open(0);
+    cap.open(0);
 
     if (!cap.isOpened())
+
+        cerr << "ERROR: Unable to open the camera" << endl;
         return -1;
-    Mat edge;//,gray,c_edge,lpf_gaussian_blurr;
+
+    Mat frame;
     namedWindow("Original_Video",1);
 
-    for(;;)
-    {
-    	Mat video;
+    Mat video;
+
+    while(true) {
     	cap >> video;//capture live feed
 
         //convert to b&w
-        cvtColor(video,edge,CV_BGR2GRAY);
-        //Canny(gray,c_edge,0,30,3);
-        //GaussianBlur(video,lpf_gaussian_blurr,Size(9,9),1.5,1.5);
+        cvtColor(video,frame,CV_BGR2GRAY);
 
-        imshow("Original_Video",edge);
+        imshow("Original_Video",frame);
 
         if(waitKey(30)>= 0) break;
     }
@@ -63,5 +94,5 @@ int main(int argc, char** argv )
 {
 
 
-    return Playback();
+    return SimpleGrab();
 }
