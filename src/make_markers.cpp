@@ -24,7 +24,6 @@ void CreateArucoMarkers()
         string imageName = "4x4Marker_";
         convert << imageName << i << ".jpg";
         imwrite(convert.str(), outputMarker);
-        cv::
     }
 }
 
