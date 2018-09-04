@@ -9,16 +9,16 @@ find_package( OpenCV REQUIRED)
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 set( GYROVIEW_SOURCES
-  src/main.cpp
+  src/main.cpp src/detect_pose.cpp src/detect_pose.hpp
 )
 set( MARKER_SOURCES
-  src/make_markers.cpp
+  src/calibrate.cpp
 )
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable( GyroView ${GYROVIEW_SOURCES} )
-add_executable( MakeMarkers ${MARKER_SOURCES} )
+add_executable( Calibrator ${MARKER_SOURCES} )
 
 target_link_libraries( GyroView ${OpenCV_LIBS} )
-target_link_libraries( MakeMarkers ${OpenCV_LIBS} )
+target_link_libraries( Calibrator ${OpenCV_LIBS} )
