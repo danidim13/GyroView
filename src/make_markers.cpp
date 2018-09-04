@@ -12,9 +12,9 @@
 using namespace cv;
 using namespace std;
 
-const float calibrationSquareDimention = 0.15; // tamaño de cada cuadro del tablero
-const float ArucoMarkerSize = 0.15; // tamaño del marcador
-const cv::Size chessboardDimensions = cv::Size(6, 9); // Dimensiones del tablero (esquinas internas)
+const float calibrationSquareDimention = 0.021; // tamaño de cada cuadro del tablero
+const float ArucoMarkerSize = 0.015; // tamaño del marcador
+const cv::Size chessboardDimensions = cv::Size(7, 9); // Dimensiones del tablero (esquinas internas)
 
 
 void createKnownBoardPosition(Size boardSize, float squareEdgeLength, vector<Point3f>& corners)
@@ -86,7 +86,7 @@ void InteractiveCalibrate() {
         vector<Vec2f> foundPoints;
         bool found = false;
 
-        found = findChessboardCorners(frame, chessboardDimensions, foundPoints, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE ); // | CV_CALIB_CB_FAST_CHECK
+        found = findChessboardCorners(frame, chessboardDimensions, foundPoints, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE | CV_CALIB_CB_FAST_CHECK); // 
         frame.copyTo(drawToFrame);
         drawChessboardCorners(drawToFrame, chessboardDimensions, foundPoints, found);
 
