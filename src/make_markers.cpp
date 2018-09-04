@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -12,13 +13,15 @@
 using namespace cv;
 using namespace std;
 
-const float calibrationSquareDimention = 0.15; // tamaño de cada cuadro del tablero
-const float ArucoMarkerSize = 0.15; // tamaño del marcador
-const cv::Size chessboardDimensions = cv::Size(6, 9); // Dimensiones del tablero (esquinas internas)
+
+const float calibrationSquareDimention = 0.021; // tamaño de cada cuadro del tablero
+const float ArucoMarkerSize = 0.015; // tamaño del marcador
+const cv::Size chessboardDimensions = cv::Size(7, 9); // Dimensiones del tablero (esquinas internas)
 
 
 void createKnownBoardPosition(Size boardSize, float squareEdgeLength, vector<Point3f>& corners)
 {
+    
     for (size_t i = 0; i < boardSize.height; i++) {
         for (size_t j = 0; j < boardSize.width; j++) {
                 corners.push_back(Point3f(j*squareEdgeLength, i*squareEdgeLength, 0.0f));
@@ -26,38 +29,49 @@ void createKnownBoardPosition(Size boardSize, float squareEdgeLength, vector<Poi
     }
 }
 
-void getChessboardCorners(vector<Mat> images, vector<vector<Point2f>>& allFoundCorners, bool showResults = false)
+void getChessboardCorners(vector<Mat> images, Size boardSize, vector<vector<Point2f>>& allFoundCorners, bool showResults = false)
 {
     for (vector<Mat>::iterator it = images.begin(); it != images.end(); it++) {
         vector<Point2f> pointBuf;
-        bool found = findChessboardCorners(*it, Size(9,6), pointBuf, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE);
+        bool found = findChessboardCorners(*it, boardSize, pointBuf, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE);
 
         if (found) {
             allFoundCorners.push_back(pointBuf);
         }
 
         if (showResults) {
-            drawChessboardCorners(*it, Size(9, 6), pointBuf, found);
+            drawChessboardCorners(*it, boardSize, pointBuf, found);
             imshow("Calibracion", *it);
             waitKey(0);
         }
     }
 }
 
-void CreateArucoMarkers()
-{
-    Mat outputMarker;
-    Ptr<aruco::Dictionary> markerDictionary = aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME::DICT_4X4_50);
 
-    for(int i = 0; i < 50; i++) {
-        aruco::drawMarker(markerDictionary, i, 500, outputMarker, 1);
-        ostringstream convert;
-        string imageName = "4x4Marker_";
-        convert << imageName << i << ".jpg";
-        imwrite(convert.str(), outputMarker);
-    }
+int calibrateFromFolder(String path)
+{
+
 }
 
+void cameraCalibration(vector<Mat> calibrationImages, Size boardSize, float squareEdgeLength, Mat& cameraMatrix, Mat& distanceCoef)
+{
+
+    // Aquí guardamos los puntos detectados por la cámara (2D)
+    vector<vector<Point2f>> chessboardImageSpacePoints;
+    getChessboardCorners(calibrationImages, boardSize, chessboardImageSpacePoints, false);
+
+    // Aquí guardamos la posición esperada de las esquinas del tablero (3d)
+    vector<vector<Point3f>> worldSpaceCornerPoints(1);
+    createKnownBoardPosition(boardSize, squareEdgeLength, worldSpaceCornerPoints[0]);
+    worldSpaceCornerPoints.resize(chessboardImageSpacePoints.size(), worldSpaceCornerPoints[0]);
+
+    // Finalmente se obtienen los parámetros de la cámara
+    vector<Mat> rVectors, tVectors;
+    distanceCoef = Mat::zeros(8, 1, CV_64F);
+    calibrateCamera(worldSpaceCornerPoints, chessboardImageSpacePoints, boardSize, cameraMatrix, distanceCoef, rVectors, tVectors);
+    
+
+}
 void InteractiveCalibrate() {
     Mat frame;
     Mat drawToFrame;
@@ -102,6 +116,25 @@ void InteractiveCalibrate() {
     }
 
     return;
+}
+
+bool SaveCalibration (string name )
+{
+    return false;
+}
+
+void CreateArucoMarkers()
+{
+    Mat outputMarker;
+    Ptr<aruco::Dictionary> markerDictionary = aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME::DICT_4X4_50);
+
+    for(int i = 0; i < 50; i++) {
+        aruco::drawMarker(markerDictionary, i, 500, outputMarker, 1);
+        ostringstream convert;
+        string imageName = "4x4Marker_";
+        convert << imageName << i << ".jpg";
+        imwrite(convert.str(), outputMarker);
+    }
 }
 
 int main(int argc, char** argv )
