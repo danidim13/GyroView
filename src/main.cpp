@@ -4,11 +4,13 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/videoio.hpp>
+#include "detect_pose.hpp"
 
 
 using namespace cv;
 using namespace std;
+
+const float MARKER_SIZE = 2.1f;
 
 int SimpleGrab()
 {
@@ -94,5 +96,5 @@ int main(int argc, char** argv )
 {
 
 
-    return SimpleGrab();
+    return ArucoDetect();
 }
