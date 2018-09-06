@@ -14,14 +14,14 @@ using namespace cv;
 using namespace std;
 
 
-const float calibrationSquareDimention = 0.021; // tamaño de cada cuadro del tablero
-const float ArucoMarkerSize = 0.015; // tamaño del marcador
+const float calibrationSquareDimention = 0.02233; // tamaño de cada cuadro del tablero
+// const float ArucoMarkerSize = 0.02236; // tamaño del marcador
 const cv::Size chessboardDimensions = cv::Size(7, 9); // Dimensiones del tablero (esquinas internas)
 
 
 void createKnownBoardPosition(Size boardSize, float squareEdgeLength, vector<Point3f>& corners)
 {
-    
+
     for (size_t i = 0; i < boardSize.height; i++) {
         for (size_t j = 0; j < boardSize.width; j++) {
                 corners.push_back(Point3f(j*squareEdgeLength, i*squareEdgeLength, 0.0f));
@@ -69,15 +69,47 @@ void cameraCalibration(vector<Mat> calibrationImages, Size boardSize, float squa
     vector<Mat> rVectors, tVectors;
     distanceCoef = Mat::zeros(8, 1, CV_64F);
     calibrateCamera(worldSpaceCornerPoints, chessboardImageSpacePoints, boardSize, cameraMatrix, distanceCoef, rVectors, tVectors);
-    
 
 }
+
+
+bool SaveCalibration (string name, Mat cameraMatrix, Mat distanceCoef)
+{
+    ofstream outStream(name);
+    if (outStream) {
+        uint16_t rows = cameraMatrix.rows;
+        uint16_t columns = cameraMatrix.cols;
+
+        for (size_t r = 0; r < rows; r++) {
+            for (size_t c = 0; c < columns; c++) {
+                double value = cameraMatrix.at<double>(r, c);
+                outStream << value << endl;
+            }
+        }
+
+        rows = distanceCoef.rows;
+        columns = distanceCoef.cols;
+
+        for (size_t r = 0; r < rows; r++) {
+            for (size_t c = 0; c < columns; c++) {
+                double value = distanceCoef.at<double>(r, c);
+                outStream << value << endl;
+            }
+        }
+
+        outStream.close();
+        return true;
+    }
+    return false;
+}
+
+
 void InteractiveCalibrate() {
     Mat frame;
     Mat drawToFrame;
     Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
 
-    Mat distanceCoefficients;
+    Mat distanceCoef;
 
     vector<Mat> savedImages;
 
@@ -113,16 +145,41 @@ void InteractiveCalibrate() {
 
         char character = waitKey(1000/fps);
 
+        switch (character) {
+            case -1:
+                // Nothing was pressed
+                break;
+            case ' ':
+                // save image
+                if (found) {
+                    Mat tmp;
+                    frame.copyTo(tmp);
+                    savedImages.push_back(tmp);
+                } else {
+                    cerr << "No chessboard was found" << endl;
+                }
+                break;
+            case 10:
+                // start calibration
+                if (savedImages.size() > 15) {
+                    cameraCalibration(savedImages, chessboardDimensions, calibrationSquareDimention, cameraMatrix, distanceCoef);
+                    SaveCalibration("calibration.txt", cameraMatrix, distanceCoef);
+                } else {
+                    cerr << "No enough images were saved, at least 15 required (" << savedImages.size() << " saved)." << endl;
+                }
+                break;
+            case 27:
+                // exit
+                return;
+                break;
+            default:
+                cerr << "Unspecified keycode: " << (int) character << endl;
+                break;
+        }
     }
 
     return;
 }
-
-bool SaveCalibration (string name )
-{
-    return false;
-}
-
 
 int main(int argc, char** argv )
 {
