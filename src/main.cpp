@@ -10,7 +10,6 @@
 using namespace cv;
 using namespace std;
 
-const float MARKER_SIZE = 2.1f;
 
 int SimpleGrab()
 {

@@ -14,7 +14,6 @@ using namespace cv;
 using namespace std;
 
 
-const float MARKER_SIZE = 2.1f;
 
 void CreateArucoMarkers()
 {
@@ -31,7 +30,7 @@ void CreateArucoMarkers()
 }
 
 int ArucoDetect() {
-    
+
     // Diccionario de marcadores usado
     Ptr<aruco::Dictionary> markerDictionary = aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME::DICT_4X4_50);
     // Id de los marcadores reconocidos
@@ -51,16 +50,16 @@ int ArucoDetect() {
     cout << "Procesando video, presione una tecla para terminar" << endl;
 
     while (true) {
-        
+
         cap >> iFrame;
-        
+
         if (iFrame.empty()) {
             cerr << "ERROR: No se obtuvo respuesta de la cámara." << endl;
             break;
         }
 
         aruco::detectMarkers(iFrame, markerDictionary, markerCorners, markerIds);
-        
+
         if (markerIds.size() > 0)
         {
             aruco::drawDetectedMarkers(iFrame, markerCorners, markerIds);
@@ -75,7 +74,7 @@ int ArucoDetect() {
         int key = cv::waitKey(5);
         key = (key==255) ? -1 : key; //#Solve bug in 3.2.0
         if (key>=0)
-            break;        
+            break;
 
     }
     return 0;
