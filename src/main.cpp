@@ -4,11 +4,12 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/videoio.hpp>
+#include "detect_pose.hpp"
 
 
 using namespace cv;
 using namespace std;
+
 
 int SimpleGrab()
 {
@@ -40,35 +41,6 @@ int SimpleGrab()
     return 0;
 }
 
-int Playback()
-{
-    VideoCapture cap;
-    cap.open(0);
-
-    if (!cap.isOpened())
-
-        cerr << "ERROR: Unable to open the camera" << endl;
-        return -1;
-
-    Mat frame;
-    namedWindow("Original_Video",1);
-
-    Mat video;
-
-    while(true) {
-    	cap >> video;//capture live feed
-
-        //convert to b&w
-        cvtColor(video,frame,CV_BGR2GRAY);
-
-        imshow("Original_Video",frame);
-
-        if(waitKey(30)>= 0) break;
-    }
-    return 0;
-
-}
-
 int ShowImg(int argc, char** argv)
 {
 
@@ -94,5 +66,5 @@ int main(int argc, char** argv )
 {
 
 
-    return SimpleGrab();
+    return ArucoDetect();
 }
