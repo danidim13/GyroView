@@ -1,12 +1,16 @@
-from pyqtgraph.Qt import QtCore, QtGui
+
+# -*- coding: utf-8 -*-
+from __future__ import print_function
+from PyQt5 import QtCore, QtGui, QtWidgets
 import numpy as np
 import pyqtgraph as pg
 import random
-import subprocess32 as subprocess
+try:
+    import subprocess32 as subprocess
+except:
+    import subprocess
 import sys
-
-
-
+from camera_dialog import Ui_Dialog
 
 class MainWindow(QtGui.QMainWindow):
 
@@ -118,12 +122,18 @@ class PlotWidget(QtGui.QWidget):
 
     def calibrator(self):
         dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Seleccione un folder con las imagenes de calibracion"))
-        print "Selected folder: %s" % dir
+        print("Selected folder: %s" % dir)
 
         code = subprocess.call(['echo', '"HOLI"'], shell=True)
-        print code
+        print(code)
 
     def run_camera(self):
+
+        ui = Ui_Dialog(self)
+
+        if ui.exec_() == QtWidgets.QDialog.Accepted:
+            print(ui.camera_cmd)
+
         pass
 
 class curveData():
@@ -154,4 +164,4 @@ if __name__ == '__main__':
     app = QtGui.QApplication([sys.argv])
     window = MainWindow()
     window.show()
-    app.exec_()
+    sys.exit(app.exec_())
